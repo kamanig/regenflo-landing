@@ -1,69 +1,51 @@
-// Make sure this route runs on Node (so fs is available) and stays dynamic.
-export const runtime = 'nodejs';
+// app/blog/[slug]/page.tsx
 export const dynamic = 'force-dynamic';
 
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
-import { MDXRemote } from "next-mdx-remote/rsc";
+import Link from "next/link";
+import { getAllSlugs, getPostBySlug } from "../../../content/blog/posts";
 
-/** Find the folder that contains your MDX posts, even on Vercel */
-function resolvePostsDir() {
-  const roots = [
-    process.cwd(),
-    path.join(process.cwd(), "regenflo-landing"),
-    path.join(process.cwd(), "..", "regenflo-landing"),
-    path.join(process.cwd(), ".."),
-  ];
-  for (const root of roots) {
-    const dir = path.join(root, "content", "blog");
-    if (fs.existsSync(dir)) return dir;
-  }
-  // last resort
-  return path.join(process.cwd(), "content", "blog");
-}
-
-/** ✅ This tells Next/Vercel the list of slugs to pre-build */
 export async function generateStaticParams() {
-  const dir = resolvePostsDir();
-  const files = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
-  return files
-    .filter((f) => f.endsWith(".mdx"))
-    .map((f) => ({ slug: f.replace(/\.mdx$/, "") }));
+  // Tell Next/Vercel which slugs exist at build time
+  return getAllSlugs().map((slug) => ({ slug }));
 }
 
-export default function BlogPost({ params }: { params: { slug: string } }) {
-  const dir = resolvePostsDir();
-  const filePath = path.join(dir, `${params.slug}.mdx`);
+type Props = { params: { slug: string } };
 
-  if (!fs.existsSync(filePath)) {
+export default function BlogPostPage({ params }: Props) {
+  const entry = getPostBySlug(params.slug);
+
+  if (!entry) {
     return (
       <main className="mx-auto max-w-3xl px-6 py-16">
         <h1 className="text-3xl font-bold">Article not found</h1>
-        <p className="mt-2 text-neutral-600">
-          I tried to load: <code className="break-all">{filePath}</code>
-        </p>
         <p className="mt-6">
-          <a className="underline" href="/blog">← Back to blog</a>
+          <Link href="/blog" className="underline">← Back to blog</Link>
         </p>
       </main>
     );
   }
 
-  const raw = fs.readFileSync(filePath, "utf8");
-  const { content, data } = matter(raw) as any;
+  const { Component, meta } = entry;
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
-      <h1 className="text-4xl font-bold tracking-tight">{data.title}</h1>
+      <h1 className="text-4xl font-bold tracking-tight">{meta.title}</h1>
       <p className="mt-2 text-sm text-neutral-500">
-        {new Date(data.date).toLocaleDateString()} {data.author ? `· ${data.author}` : ""}
+        {new Date(meta.date).toLocaleDateString()}
+        {meta.author ? ` · ${meta.author}` : ""}
       </p>
+      {meta.description && (
+        <p className="mt-3 text-neutral-700">{meta.description}</p>
+      )}
+
       <article className="prose prose-neutral mt-8 max-w-none">
-        <MDXRemote source={content} />
+        <Component /> {/* ← render MDX directly */}
       </article>
+
       <div className="mt-10">
-        <a href="/blog" className="text-sm font-medium hover:underline">← Back to all articles</a>
+        <Link href="/blog" className="text-sm font-medium hover:underline">
+          ← Back to all articles
+        </Link>
       </div>
     </main>
   );

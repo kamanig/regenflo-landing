@@ -8,16 +8,15 @@
     ],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,
-    "forceConsistentCasingInFileNames": true,
+    "strict": true,
     "noEmit": true,
-    "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "esModuleInterop": true,
     "plugins": [
       {
         "name": "next"
@@ -25,8 +24,10 @@
     ]
   },
   "include": [
+    "**/*.mdx",
     "**/*.ts",
     "**/*.tsx",
+    "mdx.d.ts",
     "next-env.d.ts",
     ".next/types/**/*.ts"
   ],
