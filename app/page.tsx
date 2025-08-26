@@ -1,45 +1,106 @@
-// app/blog/page.tsx
-export const dynamic = 'force-dynamic';
-
+// app/page.tsx
 import Link from "next/link";
-import { getAllPosts } from "@/content/blog/posts";
 
-export default function BlogPage() {
-  const posts = getAllPosts();
-
+export default function Home() {
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16">
-      <h1 className="text-4xl font-bold tracking-tight">ReGenflō Blog</h1>
-      <p className="mt-2 text-neutral-600">
-        Deep dives, practical guides, and the science behind terrain repair.
-      </p>
+    <main className="mx-auto max-w-6xl px-6 py-16">
+      {/* Hero */}
+      <section className="text-center">
+        <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
+          ReGenflō — Build the Human Foundation
+        </h1>
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-neutral-600">
+          From managing symptoms to rebuilding resilience. Upgrade energy,
+          immunity and recovery with a systems-first approach.
+        </p>
 
-      <div className="mt-8 space-y-6">
-        {posts.map(({ slug, meta }) => (
-          <article key={slug} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
-            <h2 className="text-2xl font-semibold">
-              <Link className="hover:underline" href={`/blog/${slug}`}>{meta.title}</Link>
-            </h2>
-            <div className="mt-1 text-sm text-neutral-500">
-              {new Date(meta.date).toLocaleDateString()} {meta.author ? `· ${meta.author}` : ""}
-            </div>
-            {meta.description && <p className="mt-2 text-neutral-700">{meta.description}</p>}
-            {Array.isArray(meta.tags) && meta.tags.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-2">
-                {meta.tags.map((t) => (
-                  <span key={t} className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700">{t}</span>
-                ))}
-              </div>
-            )}
-          </article>
-        ))}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/blog"
+            className="rounded-xl bg-black px-5 py-3 text-white shadow-md transition hover:bg-neutral-800"
+          >
+            Read the Blog
+          </Link>
 
-        {posts.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-neutral-300 p-6 text-center text-neutral-600">
-            No posts yet. Add an <code>.mdx</code> file in <code>content/blog</code> and register it in <code>content/blog/posts.ts</code>.
-          </div>
-        )}
-      </div>
+          <a
+            href="https://calendly.com/mehul-lifely"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-xl border border-neutral-300 px-5 py-3 shadow-sm transition hover:bg-neutral-50"
+          >
+            Book a Call
+          </a>
+
+          <a
+            href="https://wa.me/919726616008"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-xl border border-green-200 px-5 py-3 text-green-700 shadow-sm transition hover:bg-green-50"
+          >
+            WhatsApp +91 97266 16008
+          </a>
+        </div>
+
+        <p className="mt-3 text-sm text-neutral-500">
+          Or email us at{" "}
+          <a
+            className="underline"
+            href="mailto:care@lifely.ae?subject=ReGenfl%C5%8D%20Inquiry"
+          >
+            care@lifely.ae
+          </a>
+          .
+        </p>
+      </section>
+
+      {/* Value props */}
+      <section className="mt-16 grid gap-6 md:grid-cols-3">
+        <div className="rounded-2xl border border-neutral-200 p-6 shadow-sm">
+          <h3 className="text-lg font-semibold">Terrain over Symptoms</h3>
+          <p className="mt-2 text-neutral-600">
+            We correct energy, minerals, circadian &amp; stress systems—the
+            “soil” that grows lasting health.
+          </p>
+        </div>
+        <div className="rounded-2xl border border-neutral-200 p-6 shadow-sm">
+          <h3 className="text-lg font-semibold">Simple, Compounding Habits</h3>
+          <p className="mt-2 text-neutral-600">
+            Tiny daily levers that stack: light, sleep, nourishment, movement,
+            breath, mindset.
+          </p>
+        </div>
+        <div className="rounded-2xl border border-neutral-200 p-6 shadow-sm">
+          <h3 className="text-lg font-semibold">Measurable Outcomes</h3>
+          <p className="mt-2 text-neutral-600">
+            Track capacity gains: morning energy, recovery, HRV, focus, mood,
+            and training tolerance.
+          </p>
+        </div>
+      </section>
+
+      {/* Secondary CTA */}
+      <section className="mt-16 rounded-2xl bg-neutral-50 p-8 text-center">
+        <h2 className="text-2xl font-bold">Start your reset</h2>
+        <p className="mt-2 text-neutral-600">
+          15-minute call to map your bottlenecks and the first 3 levers to pull.
+        </p>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <a
+            href="https://calendly.com/mehul-lifely"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-xl bg-black px-5 py-3 text-white shadow-md transition hover:bg-neutral-800"
+          >
+            Book on Calendly
+          </a>
+          <Link
+            href="/blog"
+            className="rounded-xl border border-neutral-300 px-5 py-3 shadow-sm transition hover:bg-white"
+          >
+            Explore Articles
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }
