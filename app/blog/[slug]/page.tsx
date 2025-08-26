@@ -1,56 +1,57 @@
-import fs from "fs"
-import path from "path"
-import matter from "gray-matter"
-import { MDXRemote } from "next-mdx-remote/rsc"
+// Make sure this route runs on Node (so fs is available) and stays dynamic.
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
-function tryResolvePostPath(slug: string) {
-  // Try several likely roots (handles odd workspace roots on Windows)
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
+import { MDXRemote } from "next-mdx-remote/rsc";
+
+/** Find the folder that contains your MDX posts, even on Vercel */
+function resolvePostsDir() {
   const roots = [
     process.cwd(),
     path.join(process.cwd(), "regenflo-landing"),
     path.join(process.cwd(), "..", "regenflo-landing"),
     path.join(process.cwd(), ".."),
-  ]
-
-  const candidates = roots.map((root) =>
-    path.join(root, "content", "blog", `${slug}.mdx`)
-  )
-
-  for (const p of candidates) {
-    if (fs.existsSync(p)) return p
+  ];
+  for (const root of roots) {
+    const dir = path.join(root, "content", "blog");
+    if (fs.existsSync(dir)) return dir;
   }
-  // If none found, return the first candidate (for diagnostics)
-  return candidates[0]
+  // last resort
+  return path.join(process.cwd(), "content", "blog");
+}
+
+/** ✅ This tells Next/Vercel the list of slugs to pre-build */
+export async function generateStaticParams() {
+  const dir = resolvePostsDir();
+  const files = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
+  return files
+    .filter((f) => f.endsWith(".mdx"))
+    .map((f) => ({ slug: f.replace(/\.mdx$/, "") }));
 }
 
 export default function BlogPost({ params }: { params: { slug: string } }) {
-  const filePath = tryResolvePostPath(params.slug)
-  const exists = fs.existsSync(filePath)
+  const dir = resolvePostsDir();
+  const filePath = path.join(dir, `${params.slug}.mdx`);
 
-  if (!exists) {
-    // Helpful dev hint on where we looked
+  if (!fs.existsSync(filePath)) {
     return (
       <main className="mx-auto max-w-3xl px-6 py-16">
         <h1 className="text-3xl font-bold">Article not found</h1>
         <p className="mt-2 text-neutral-600">
           I tried to load: <code className="break-all">{filePath}</code>
         </p>
-        <p className="mt-2">
-          Make sure a file exists at <code>content/blog/{params.slug}.mdx</code>.
-        </p>
         <p className="mt-6">
-          Back to the{" "}
-          <a className="underline" href="/blog">
-            blog
-          </a>
-          .
+          <a className="underline" href="/blog">← Back to blog</a>
         </p>
       </main>
-    )
+    );
   }
 
-  const raw = fs.readFileSync(filePath, "utf8")
-  const { content, data } = matter(raw) as any
+  const raw = fs.readFileSync(filePath, "utf8");
+  const { content, data } = matter(raw) as any;
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
@@ -62,10 +63,8 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
         <MDXRemote source={content} />
       </article>
       <div className="mt-10">
-        <a href="/blog" className="text-sm font-medium text-neutral-900 hover:underline">
-          ← Back to all articles
-        </a>
+        <a href="/blog" className="text-sm font-medium hover:underline">← Back to all articles</a>
       </div>
     </main>
-  )
+  );
 }
