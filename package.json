@@ -9,8 +9,10 @@
   },
   "dependencies": {
     "framer-motion": "^12.23.12",
+    "gray-matter": "^4.0.3",
     "lucide-react": "^0.542.0",
     "next": "latest",
+    "next-mdx-remote": "^5.0.0",
     "nodemailer": "^7.0.5",
     "react": "latest",
     "react-dom": "latest"
